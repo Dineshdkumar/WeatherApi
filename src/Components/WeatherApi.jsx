@@ -46,26 +46,26 @@ const formatCurrentWeather = (data) => {
     timezone,
   };
 };
-
-const formatForecastWeather = (secs, offset, data) => {
+const formatForecastWeather = (secs, zone, data) => {
+  // Filtering hourly data: get data for timestamps after 'secs'
   const hourly = data
     .filter((f) => f.dt > secs)
-
     .map((f) => ({
       temp: f.main.temp,
-      title: formatToLocalTime(f.dt, offset, "hh:mm a"),
+      title: formatToLocalTime(f.dt, zone, "hh:mm a"), // Format time using the correct zone
       icon: iconUrlFromCode(f.weather[0].icon),
-      date: f.dt_txt,
+      date: formatToLocalTime(f.dt, zone, "cccc, dd LLL yyyy"), // Add full date for reference
     }))
-    .slice(0, 5);
+    .slice(0, 5); // Only take the first 5 hourly entries
 
+  // Filtering daily data: get entries where the time is midnight (00:00:00)
   const daily = data
     .filter((f) => f.dt_txt.slice(-8) === "00:00:00")
     .map((f) => ({
       temp: f.main.temp,
-      title: formatToLocalTime(f.dt, offset, "ccc"),
+      title: formatToLocalTime(f.dt, zone, "ccc"), // Use the weekday format
       icon: iconUrlFromCode(f.weather[0].icon),
-      date: f.dt_txt,
+      date: formatToLocalTime(f.dt, zone, "cccc, dd LLL yyyy"), // Add full date for daily entries
     }));
 
   return { hourly, daily };
@@ -89,11 +89,11 @@ const getFormattedWeatherData = async (searchParams) => {
 };
 
 const formatToLocalTime = (
-  secs,
+  secs = Math.floor(Date.now() / 1000),
   zone,
   format = "cccc, dd LLL yyyy' | Local time: 'hh:mm a"
 ) => DateTime.fromSeconds(secs).setZone(zone).toFormat(format);
-6;
+
 const iconUrlFromCode = (code) =>
   `http://openweathermap.org/img/wn/${code}@2x.png`;
 

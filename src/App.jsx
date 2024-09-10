@@ -36,9 +36,18 @@ const App = () => {
     });
   };
 
+  const formatBackground = () => {
+    if (!weather) return "from-cyan-700 to-blue-700";
+    const threshold = units === "metric" ? 23 : 65;
+    if (weather.temp <= threshold) return "from-cyan-700 to-blue-700";
+    return "from-yellow-700 to-orange-700";
+  };
+
   return (
     <>
-      <div className="mx-auto h-fit max-w-screen-md shadow-md  w-[50%] bg-blue-500">
+      <div
+        className={`mx-auto h-fit max-w-screen-md shadow-md  w-[50%] bg-gradient-to-r ${formatBackground()}`}
+      >
         <TopButtons setQuery={setQuery} />
         <InputContainer setQuery={setQuery} setUnits={setUnits} />
         {weather && (
